@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 use std::collections::HashMap;
+use std::net::IpAddr;
 
 use carbide_uuid::machine::{MachineId, MachineInterfaceId};
 use carbide_uuid::rack::RackId;
@@ -67,6 +68,8 @@ pub struct ExpectedMachineData {
     pub rack_id: Option<RackId>,
     pub default_pause_ingestion_and_poweron: Option<bool>,
     pub dpf_enabled: Option<bool>,
+    #[serde(default)]
+    pub ip_address: Option<IpAddr>,
 }
 // Important : new fields for expected machine (and data) should be optional _and_ serde(default),
 // unless you want to go update all the files in each production deployment that autoload
@@ -100,6 +103,7 @@ impl<'r> FromRow<'r, PgRow> for ExpectedMachine {
                 default_pause_ingestion_and_poweron: row
                     .try_get("default_pause_ingestion_and_poweron")?,
                 dpf_enabled: row.try_get("dpf_enabled")?,
+                ip_address: row.try_get("ip_address")?,
             },
         })
     }
@@ -157,6 +161,7 @@ impl From<ExpectedMachine> for rpc::forge::ExpectedMachine {
             #[allow(deprecated)]
             dpf_enabled: expected_machine.data.dpf_enabled.unwrap_or_default(),
             is_dpf_enabled: expected_machine.data.dpf_enabled,
+            ip_address: expected_machine.data.ip_address.map(|ip| ip.to_string()),
         }
     }
 }
@@ -202,6 +207,9 @@ impl TryFrom<rpc::forge::ExpectedMachine> for ExpectedMachineData {
             rack_id: em.rack_id,
             default_pause_ingestion_and_poweron: em.default_pause_ingestion_and_poweron,
             dpf_enabled: em.is_dpf_enabled,
+            ip_address: em
+                .ip_address
+                .and_then(|s| s.parse::<IpAddr>().ok()),
         })
     }
 }

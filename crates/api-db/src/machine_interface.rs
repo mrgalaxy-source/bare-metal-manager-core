@@ -594,6 +594,29 @@ async fn try_create_fast_path(
     .await
 }
 
+/// Create a machine interface with a specific IP address (for static IPs).
+/// This bypasses the normal allocation strategy and directly assigns the given IP.
+pub async fn create_with_specific_ip(
+    txn: &mut PgConnection,
+    segment: &NetworkSegment,
+    macaddr: &MacAddress,
+    domain_id: Option<DomainId>,
+    primary_interface: bool,
+    ip_address: IpAddr,
+) -> DatabaseResult<MachineInterfaceSnapshot> {
+    let interface_id = create_inner(
+        txn,
+        segment,
+        macaddr,
+        domain_id,
+        primary_interface,
+        &[ip_address],
+    )
+    .await?;
+
+    find_one(txn, interface_id).await
+}
+
 /// Create the actual machine interface once we know what addresses we want.
 async fn create_inner(
     txn: &mut PgConnection,

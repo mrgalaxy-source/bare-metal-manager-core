@@ -4586,6 +4586,8 @@ message ExpectedMachine {
   // deprecated
   bool dpf_enabled = 12 [deprecated = true];
   optional bool is_dpf_enabled = 13;
+  // Static IP address for BMC (optional override for DHCP-based discovery)
+  optional string ip_address = 14;
 }
 
 message ExpectedMachineRequest {

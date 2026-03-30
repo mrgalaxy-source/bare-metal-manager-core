@@ -1388,6 +1388,14 @@ pub struct SiteExplorerConfig {
     )]
     pub explore_power_shelves_from_static_ip: Arc<AtomicBool>,
 
+    /// Whether SiteExplorer should explore Machines from static IP
+    #[serde(
+        default = "SiteExplorerConfig::default_explore_machines_from_static_ip",
+        deserialize_with = "deserialize_arc_atomic_bool",
+        serialize_with = "serialize_arc_atomic_bool"
+    )]
+    pub explore_machines_from_static_ip: Arc<AtomicBool>,
+
     #[serde(default = "SiteExplorerConfig::default_power_shelves_created_per_run")]
     /// How many Power Shelves should be created in a single run.
     /// Default is 1.
@@ -1436,6 +1444,7 @@ impl Default for SiteExplorerConfig {
             allocate_secondary_vtep_ip: false,
             create_power_shelves: Arc::new(true.into()),
             explore_power_shelves_from_static_ip: Arc::new(true.into()),
+            explore_machines_from_static_ip: Arc::new(true.into()),
             power_shelves_created_per_run: Self::default_power_shelves_created_per_run(),
             create_switches: Arc::new(true.into()),
             switches_created_per_run: Self::default_switches_created_per_run(),
@@ -1498,6 +1507,10 @@ impl SiteExplorerConfig {
 
     pub fn default_explore_power_shelves_from_static_ip() -> Arc<AtomicBool> {
         Arc::new(false.into())
+    }
+
+    pub fn default_explore_machines_from_static_ip() -> Arc<AtomicBool> {
+        Arc::new(true.into())
     }
 
     pub const fn default_power_shelves_created_per_run() -> u64 {

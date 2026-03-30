@@ -481,6 +481,7 @@ impl ApiClient {
         rack_id: Option<RackId>,
         default_pause_ingestion_and_poweron: Option<bool>,
         dpf_enabled: Option<bool>,
+        ip_address: Option<String>,
     ) -> Result<(), CarbideCliError> {
         let expected_machine = self
             .0
@@ -543,6 +544,7 @@ impl ApiClient {
             #[allow(deprecated)]
             dpf_enabled: dpf_enabled.unwrap_or_default(),
             is_dpf_enabled: dpf_enabled,
+            ip_address: ip_address.or(expected_machine.ip_address),
         };
 
         Ok(self.0.update_expected_machine(request).await?)
@@ -639,6 +641,7 @@ impl ApiClient {
                     #[allow(deprecated)]
                     dpf_enabled: machine.dpf_enabled.unwrap_or_default(),
                     is_dpf_enabled: machine.dpf_enabled,
+                    ip_address: machine.ip_address,
                 })
                 .collect(),
         };
